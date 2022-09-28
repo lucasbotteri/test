@@ -37,4 +37,4 @@ jobs:
       - name: Tag/Deploy RC To Preprod
         run: |
           git tag preprod_v${{ github.event.inputs.release_number }}_${{ github.event.inputs.build_number }}
-          git push tag preprod_v${{ github.event.inputs.release_number }}_${{ github.event.inputs.build_number }}
+          git push preprod_v${{ github.event.inputs.release_number }}_${{ github.event.inputs.build_number }}
