@@ -28,4 +28,4 @@ jobs:
       - name: Tag RC To Enviroment
         run: |
           git tag ${{ github.event.inputs.enviroment }}_${{ github.actor }}_${{ steps.deploy_branch.outputs.date }}
-          git push ${{ github.event.inputs.enviroment }}_${{ github.actor }}_${{ steps.deploy_branch.outputs.date }}
+          git push origin ${{ github.event.inputs.enviroment }}_${{ github.actor }}_${{ steps.deploy_branch.outputs.date }}
