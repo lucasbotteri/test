@@ -1,0 +1,46 @@
+# This is a basic workflow that is manually triggered
+
+name: Create and Deploy Release Candidate
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    inputs:
+      release_number:
+        description: "Release Number"
+        required: true
+      build_number:
+        description: "Build Number"
+        required: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "greet"
+  checkout_bump_and_deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Check out Develop
+        with:
+          ref: develop
+        uses: actions/checkout@v2
+      - name: Create Release Branch
+        run: git checkout -b release/v${{ github.event.inputs.release_number }}
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email noreply@github.com
+      - name: Change build version
+        run: >
+          sed -i 's/"version": ".*",/"version": "2.6",/g' package.json
+      - name: Commit new build version
+        run: |
+          git add package.json
+          git commit --message "Bump build version to ${{ github.event.inputs.build_number }}"
+      - name: Push new branch
+        run: git push origin release/v${{ github.event.inputs.release_number }}
+      - name: Tag RC To preprod
+        run: git tag preprod_v${{ github.event.inputs.release_number }}_${{ github.event.inputs.build_number }}
