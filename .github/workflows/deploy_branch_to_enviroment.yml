@@ -1,0 +1,31 @@
+name: Deploy Branch To enviroment
+
+on:
+  workflow_dispatch:
+    inputs:
+      enviroment:
+        description: "Enviroment"
+        type: choice
+        options:
+          - preprod
+          - preprod2
+          - envblue
+        required: true
+jobs:
+  deploy_branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out to Branch
+        uses: actions/checkout@v2
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email noreply@github.com
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%dT%H:%M:%S')""
+      - name: Tag RC To Enviroment
+        run: |
+          git tag ${{ github.event.inputs.enviroment }}_${{ github.actor }}_${{ steps.deploy_branch.outputs.date }}
+          git push ${{ github.event.inputs.enviroment }}_${{ github.actor }}_${{ steps.deploy_branch.outputs.date }}

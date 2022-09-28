@@ -1,4 +1,4 @@
-name: Create and Deploy Release Candidate
+name: Deploy Release Candidate With Fix To Pre Prod
 
 on:
   workflow_dispatch:
@@ -11,16 +11,12 @@ on:
         required: true
 
 jobs:
-  checkout_bump_and_deploy:
+  checkout:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out Develop
-        with:
-          ref: develop
+      - name: Check out to Branch
         uses: actions/checkout@v2
-      - name: Create Release Branch
-        run: git checkout -b release/v${{ github.event.inputs.release_number }}
       - name: Initialize mandatory git config
         run: |
           git config user.name "GitHub Actions"
@@ -28,13 +24,13 @@ jobs:
       - name: Bump Build Version
         run: >
           sed -i 's/"version": ".*",/"version": "2.6",/g' package.json
-      - name: Commit New Build Version
+      - name: Commit new build version
         run: |
           git add package.json
           git commit --message "Bump build version to ${{ github.event.inputs.build_number }}"
-      - name: Push New Branch
-        run: git push origin release/v${{ github.event.inputs.release_number }}
-      - name: Tag/Deploy RC To Preprod
+      - name: Push updated branch
+        run: git push origin
+      - name: Tag RC To preprod
         run: |
           git tag preprod_v${{ github.event.inputs.release_number }}_${{ github.event.inputs.build_number }}
           git push tag preprod_v${{ github.event.inputs.release_number }}_${{ github.event.inputs.build_number }}
