@@ -24,7 +24,7 @@ jobs:
           git config user.email noreply@github.com
       - name: Get current date
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%dT%H:%M:%S')""
+        run: echo "::set-output name=date::$(date +'%Y-%m-%dT%H:%M:%S')"
       - name: Tag RC To Enviroment
         run: |
           git tag ${{ github.event.inputs.enviroment }}_${{ github.actor }}_${{ steps.deploy_branch.outputs.date }}
