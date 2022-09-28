@@ -23,7 +23,7 @@ jobs:
           git config user.email noreply@github.com
       - name: Bump Build Version
         run: >
-          sed -i 's/"version": ".*",/"version": "2.6",/g' package.json
+          sed -i 's/"version": ".*",/"version": "${{ github.event.inputs.build_number }}",/g' package.json
       - name: Commit new build version
         run: |
           git add package.json
@@ -33,4 +33,4 @@ jobs:
       - name: Tag RC To preprod
         run: |
           git tag preprod_v${{ github.event.inputs.release_number }}_${{ github.event.inputs.build_number }}
-          git push origin preprod_v${{ github.event.inputs.release_number }}_${{ github.event.inputs.build_number }}
+          git push origina preprod_v${{ github.event.inputs.release_number }}_${{ github.event.inputs.build_number }}
