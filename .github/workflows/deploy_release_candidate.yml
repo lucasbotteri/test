@@ -6,16 +6,27 @@ on:
       release_number:
         description: "Release Number"
         required: true
+      commit_id:
+        description: "Commit Id For Cutoff (Last Commit by default)"
+        required: false
 
 jobs:
   checkout_deploy_and_create_PR:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out Develop
+      - name: Check out last commit on Develop
         with:
           ref: develop
+          fetch-depth: 0
         uses: actions/checkout@v2
+        if: "${{ github.event.inputs.commit_id == '' }}"
+      - name: Check out to commit on Develop
+        with:
+          ref: ${{ github.event.inputs.commit_id }}
+          fetch-depth: 0
+        uses: actions/checkout@v2
+        if: "${{ github.event.inputs.commit_id != '' }}"
       - name: Create Release Branch
         run: git checkout -b release/v${{ github.event.inputs.release_number }}
       - name: Initialize mandatory git config
