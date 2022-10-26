@@ -33,6 +33,7 @@ jobs:
           git push origin preprod_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
       - name: Create RC Pull Request
         uses: peter-evans/create-pull-request@v4
-        title: RC v${{ github.event.inputs.release_number }}
-        body: RC v${{ github.event.inputs.release_number }}
-        base: master
+        with:
+          title: RC v${{ github.event.inputs.release_number }}
+          body: RC v${{ github.event.inputs.release_number }}
+          base: master
