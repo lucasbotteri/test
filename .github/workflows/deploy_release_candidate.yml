@@ -43,6 +43,6 @@ jobs:
           git tag preprod_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
           git push origin preprod_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
       - name: Create RC Pull Request
-        run: gh pr create -B master -H release/v${{ github.event.inputs.release_number }} --title 'Release Candidate v${{ github.event.inputs.release_number }}' --body '' -l release-candidate
+        run: gh pr create -B master -H release/v${{ github.event.inputs.release_number }} --title 'Release Candidate v${{ github.event.inputs.release_number }}' --body '' -l 'release-candidate'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
