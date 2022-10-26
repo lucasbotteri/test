@@ -37,7 +37,7 @@ jobs:
         run: git push origin release/v${{ github.event.inputs.release_number }}
       - name: Get current date
         id: date
-        run: echo "date_time=$(date +'%Y-%m-%d-%H:%M:%S')" >> $GITHUB_ENV
+        run: echo "date_time=$(date +'%Y-%m-%d--%H-%M-%S')" >> $GITHUB_ENV
       - name: Tag/Deploy RC To Preprod
         run: |
           git tag preprod_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
