@@ -6,9 +6,6 @@ on:
       release_number:
         description: "Release Number"
         required: true
-      build_number:
-        description: "Build Number"
-        required: true
 
 jobs:
   checkout_bump_and_deploy:
@@ -17,7 +14,7 @@ jobs:
     steps:
       - name: Check out Develop
         with:
-          ref: main
+          ref: develop
         uses: actions/checkout@v2
       - name: Create Release Branch
         run: git checkout -b release/v${{ github.event.inputs.release_number }}
@@ -25,16 +22,17 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email noreply@github.com
-      - name: Bump Build Version
-        run: >
-          sed -i 's/"version": ".*",/"version": "${{ github.event.inputs.build_number }}",/g' package.json
-      - name: Commit New Build Version
-        run: |
-          git add package.json
-          git commit --message "Bump build version to ${{ github.event.inputs.build_number }}"
       - name: Push New Branch
         run: git push origin release/v${{ github.event.inputs.release_number }}
+      - name: Get current date
+        id: date
+        run: echo "date_time=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
       - name: Tag/Deploy RC To Preprod
         run: |
-          git tag preprod_v${{ github.event.inputs.release_number }}_build_${{ github.event.inputs.build_number }}
-          git push origin preprod_v${{ github.event.inputs.release_number }}_build_${{ github.event.inputs.build_number }}
+          git tag preprod_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
+          git push origin preprod_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
+      - name: Create RC Pull Request
+        uses: peter-evans/create-pull-request@v4
+        title: RC v${{ github.event.inputs.release_number }}
+        body: RC v${{ github.event.inputs.release_number }}
+        base: master
