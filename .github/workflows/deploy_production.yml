@@ -6,6 +6,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Init git
+        with:
+          fetch-depth: 0
+        uses: actions/checkout@v2
       - name: Find Release Candidate PR Number
         run: |
           pullRequestNumber="$(gh pr list --base master --label 'release-candidate' --limit 1 --json number --jq '.[].number')"
