@@ -46,3 +46,11 @@ jobs:
         run: gh pr create -B master -H release/v${{ github.event.inputs.release_number }} --title 'Release Candidate v${{ github.event.inputs.release_number }}' --body ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout out last commit on Master
+        with:
+          ref: master
+          fetch-depth: 0\
+      - name: Tag/Deploy previous RC To Preprod2
+        run: |
+          git tag preprod2_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
+          git push origin preprod2_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
