@@ -1,4 +1,4 @@
-name: Deploy Master To Production
+name: Deploy Release Candidate To Production
 on: workflow_dispatch
 
 jobs:
@@ -7,7 +7,10 @@ jobs:
 
     steps:
       - name: Find Release Candidate PR Number
-        run: echo "pull_request_number=$(gh pr list --base master --label 'release-candidate' --limit 1 --json number --jq '.[].number')" >> $GITHUB_ENV
+        run: |
+          pullRequestNumber="$(gh pr list --base master --label 'release-candidate' --limit 1 --json number --jq '.[].number')"
+          echo $pullRequestNumber
+          echo 'pull_request_number='$pullRequestNumber >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Approve Release Candidate PR
