@@ -11,18 +11,11 @@ jobs:
           fetch-depth: 0
         uses: actions/checkout@v2
       - name: Find Release Candidate PR Number
-        run: |
-          pullRequestNumber="$(gh pr list --base master --label 'release-candidate' --limit 1 --json number --jq '.[].number')"
-          echo $pullRequestNumber
-          echo 'pull_request_number='$pullRequestNumber >> $GITHUB_ENV
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Approve Release Candidate PR
-        run: gh pr review --approve ${{ env.pull_request_number }}
+        run: echo "pull_request_number=$(gh pr list --review 'approved' --base master --label 'release-candidate' --limit 1 --json number --jq '.[].number')" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Merge Release Candidate to Master
-        run: gh pr merge -m --delete-branch
+        run: gh pr merge -m --delete-branch --admin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout out last commit on Master
