@@ -49,7 +49,7 @@ jobs:
       - name: Checkout out last commit on Master
         with:
           ref: master
-          fetch-depth: 0\
+          fetch-depth: 0
       - name: Tag/Deploy previous RC To Preprod2
         run: |
           git tag preprod2_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
