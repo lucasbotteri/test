@@ -50,6 +50,7 @@ jobs:
         with:
           ref: master
           fetch-depth: 0
+        uses: actions/checkout@v2
       - name: Tag/Deploy previous RC To Preprod2
         run: |
           git tag preprod2_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
