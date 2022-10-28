@@ -26,6 +26,7 @@ jobs:
           elif [ $release_candidate_pull_request_count -lt 1 ] 
           then 
             echo There is no PR that matches Release Candidate Criteria 
+            exit 1
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
