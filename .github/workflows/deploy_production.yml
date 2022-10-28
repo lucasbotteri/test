@@ -1,13 +1,15 @@
 name: Deploy Release Candidate To Production
-on: workflow_dispatch
 
-jobs:
-  deploy_master_to_production:
-    runs-on: ubuntu-latest
+on:
+  workflow_dispatch:
     inputs:
       release_number:
         description: "Release Number"
         required: true
+
+jobs:
+  deploy_master_to_production:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Init git
@@ -17,17 +19,19 @@ jobs:
       - name: Find Release Candidate PR Number
         run: |
           echo "pull_request_number=$(gh search prs --base master --label 'release-candidate' --state="open" --limit 1 --json number --jq '.[].number')" >> $GITHUB_ENV
-          eho PR Number #${{ env.pull_request_number }}
+      - name: Log PR information
+        run: |
+          echo PR Number #${{ env.pull_request_number }}
           echo PR link ${{ github.server_url }}/${{ github.repository }}/pull/${{ env.pull_request_number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check if PR exists
-        if: pull_request_number == ""
+        if: ${{ env.pull_request_number == '' }}
         run: |
           echo PR does not exists
           exit 1
       - name: Merge Release Candidate to Master
-        run: gh pr merge ${{ env.pull_request_number }} -m --delete-branch --admin --body "Merge Release Candidate v${{ env.pull_request_number }}"
+        run: gh pr merge ${{ env.pull_request_number }} -m --delete-branch --admin --body "Merge Release Candidate v${{ env.pull_request_number }}" --subject "Merge Release Candidate v${{ env.pull_request_number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout out last commit on Master
