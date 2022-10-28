@@ -28,7 +28,7 @@ jobs:
       - name: Check if more than one PR matches
         if: ${{ env.pull_request_number }} | awk 'END{print NR}' !== '1'
         run: |
-          echo Multiple PRs matches
+          echo Multiple PRs matches $(${{ env.pull_request_number }} | awk 'END{print NR}')
           exit 1
       - name: Log PR information
         run: |
