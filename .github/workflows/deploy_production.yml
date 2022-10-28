@@ -19,26 +19,22 @@ jobs:
       - name: Check only 1 PR Matches Release Candidate Criteria
         run: |
           release_candidate_pull_request_count=$(gh search prs --repo ${{ github.repository }} --base master --label 'release-candidate' --state="open" --json number --jq 'length')
-          if [ $release_candidate_pull_request_count -ne 1 ]
+          if [ $release_candidate_pull_request_count -gt 1 ]
           then
             echo More than 1 PR matches Release Candidate Criteria - There are $release_candidate_pull_request_count PRs
             exit 1
+          elif [ $release_candidate_pull_request_count -lt 1 ] 
+          then 
+            echo There is no PR that matches Release Candidate Criteria 
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Find Release Candidate PR Number
         run: echo "pull_request_number=$(gh search prs --repo ${{ github.repository }} --base master --label 'release-candidate' --state="open" --limit 1 --json number --jq '.[].number')" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check if PR exists
-        if: ${{ env.pull_request_number == '' }}
-        run: |
-          echo PR does not exists
-          exit 1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }
       - name: Log PR information
-        run: |
-          echo PR Number #${{ env.pull_request_number }}
-          echo PR link ${{ github.server_url }}/${{ github.repository }}/pull/${{ env.pull_request_number }}
+        run: echo PR link ${{ github.server_url }}/${{ github.repository }}/pull/${{ env.pull_request_number }}
       - name: Merge Release Candidate to Master
         run: gh pr merge ${{ env.pull_request_number }} -m --delete-branch --admin --subject "Merge Release Candidate v${{ env.pull_request_number }}"
         env:
