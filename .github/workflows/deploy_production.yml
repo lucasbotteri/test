@@ -16,6 +16,14 @@ jobs:
         with:
           fetch-depth: 0
         uses: actions/checkout@v2
+      - name: Check only 1 PR Matches Release Candidate Criteria
+        run: |
+          release_candidate_pull_request_count=$(gh search prs --base master --label 'release-candidate' --state="open" --json number --jq 'length')" 
+          if [ $release_candidate_pull_request_count -ne 1 ]
+          then
+            echo More than 1 PR matches Release Candidate Criteria $release_candidate_pull_request_count
+            exit 1
+          fi
       - name: Find Release Candidate PR Number
         run: echo "pull_request_number=$(gh search prs --base master --label 'release-candidate' --state="open" --limit 1 --json number --jq '.[].number')" >> $GITHUB_ENV
         env:
