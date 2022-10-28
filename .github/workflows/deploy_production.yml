@@ -1,13 +1,14 @@
 name: Deploy Release Candidate To Production
-on: workflow_dispatch
+on:
+workflow_dispatch:
+  inputs:
+    release_number:
+      description: "Release Number"
+      required: true
 
 jobs:
   deploy_master_to_production:
     runs-on: ubuntu-latest
-    inputs:
-      release_number:
-        description: "Release Number"
-        required: true
 
     steps:
       - name: Init git
