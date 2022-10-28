@@ -21,7 +21,7 @@ jobs:
           release_candidate_pull_request_count=$(gh search prs --base master --label 'release-candidate' --state="open" --json number --jq 'length')
           if [ $release_candidate_pull_request_count -ne 1 ]
           then
-            echo More than 1 PR matches Release Candidate Criteria $release_candidate_pull_request_count
+            echo More than 1 PR matches Release Candidate Criteria - There are $release_candidate_pull_request_count PRs
             exit 1
           fi
         env:
@@ -34,11 +34,6 @@ jobs:
         if: ${{ env.pull_request_number == '' }}
         run: |
           echo PR does not exists
-          exit 1
-      - name: Check if more than one PR matches
-        if: ${{ env.pull_request_number }} | awk 'END{print NR}' !== '1'
-        run: |
-          echo Multiple PRs matches $(${{ env.pull_request_number }} | awk 'END{print NR}')
           exit 1
       - name: Log PR information
         run: |
