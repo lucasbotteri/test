@@ -11,7 +11,7 @@ jobs:
           fetch-depth: 0
         uses: actions/checkout@v2
       - name: Find Release Candidate PR Number
-        run: echo "pull_request_number=$(gh pr list --review 'approved' --base master --label 'release-candidate' --limit 1 --json number --jq '.[].number')" >> $GITHUB_ENV
+        run: echo "pull_request_number=$(gh search prs --base master --label 'release-candidate' --state="open" --limit 1 --json number --jq '.[].number')" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Merge Release Candidate to Master
