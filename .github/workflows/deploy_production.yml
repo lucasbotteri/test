@@ -24,6 +24,8 @@ jobs:
             echo More than 1 PR matches Release Candidate Criteria $release_candidate_pull_request_count
             exit 1
           fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Find Release Candidate PR Number
         run: echo "pull_request_number=$(gh search prs --base master --label 'release-candidate' --state="open" --limit 1 --json number --jq '.[].number')" >> $GITHUB_ENV
         env:
