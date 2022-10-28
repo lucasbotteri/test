@@ -25,6 +25,11 @@ jobs:
         run: |
           echo PR does not exists
           exit 1
+      - name: Check if more than one PR matches
+        if: ${{ env.pull_request_number }} | awk 'END{print NR}' !== '1'
+        run: |
+          echo Multiple PRs matches
+          exit 1
       - name: Log PR information
         run: |
           echo PR Number #${{ env.pull_request_number }}
