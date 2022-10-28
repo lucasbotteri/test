@@ -19,6 +19,8 @@ jobs:
       - name: Find Release Candidate PR Number
         run: |
           echo "pull_request_number=$(gh search prs --base master --label 'release-candidate' --state="open" --limit 1 --json number --jq '.[].number')" >> $GITHUB_ENV
+      - name: Log PR information
+        run: |
           echo PR Number #${{ env.pull_request_number }}
           echo PR link ${{ github.server_url }}/${{ github.repository }}/pull/${{ env.pull_request_number }}
         env:
@@ -29,7 +31,7 @@ jobs:
           echo PR does not exists
           exit 1
       - name: Merge Release Candidate to Master
-        run: gh pr merge ${{ env.pull_request_number }} -m --delete-branch --admin --body "Merge Release Candidate v${{ env.pull_request_number }}"
+        run: gh pr merge ${{ env.pull_request_number }} -m --delete-branch --admin --body "Merge Release Candidate v${{ env.pull_request_number }}" --subject "Merge Release Candidate v${{ env.pull_request_number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout out last commit on Master
