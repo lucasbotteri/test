@@ -30,7 +30,7 @@ jobs:
           echo PR Number #${{ env.pull_request_number }}
           echo PR link ${{ github.server_url }}/${{ github.repository }}/pull/${{ env.pull_request_number }}
       - name: Merge Release Candidate to Master
-        run: gh pr merge ${{ env.pull_request_number }} -m --delete-branch --admin --body "Merge Release Candidate v${{ env.pull_request_number }}" --subject "Merge Release Candidate v${{ env.pull_request_number }}"
+        run: gh pr merge ${{ env.pull_request_number }} -m --delete-branch --admin --subject "Merge Release Candidate v${{ env.pull_request_number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout out last commit on Master
