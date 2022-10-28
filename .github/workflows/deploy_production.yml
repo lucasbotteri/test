@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Check only 1 PR Matches Release Candidate Criteria
         run: |
-          release_candidate_pull_request_count=$(gh search prs --repo ${{ github.repository }} --base master --label 'release-candidate' --state="open" --json number --jq 'length')
+          release_candidate_pull_request_count=$(gh search prs --repo ${{ github.repository }} --base master --label 'release-candidate' --state="open" --json number --jq 'length' 'Release Candidate v{{ github.event.inputs.release_number }}')
           if [ $release_candidate_pull_request_count -gt 1 ]
           then
             echo More than 1 PR matches Release Candidate Criteria - There are $release_candidate_pull_request_count PRs
@@ -31,7 +31,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Find Release Candidate PR Number
-        run: echo "pull_request_number=$(gh search prs --repo ${{ github.repository }} --base master --label 'release-candidate' --state="open" --limit 1 --json number --jq '.[].number')" >> $GITHUB_ENV
+        run: echo "pull_request_number=$(gh search prs --repo ${{ github.repository }} --base master --label 'release-candidate' --state="open" --limit 1 --json number --jq '.[].number') 'Release Candidate v{{ github.event.inputs.release_number }}'" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Log PR information
