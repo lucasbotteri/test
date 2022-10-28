@@ -18,12 +18,13 @@ jobs:
         uses: actions/checkout@v2
       - name: Find Release Candidate PR Number
         run: echo "pull_request_number=$(gh search prs --base master --label 'release-candidate' --state="open" --limit 1 --json number --jq '.[].number')" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Log PR information
         run: |
           echo PR Number #${{ env.pull_request_number }}
           echo PR link ${{ github.server_url }}/${{ github.repository }}/pull/${{ env.pull_request_number }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Check if PR exists
         if: ${{ env.pull_request_number == '' }}
         run: |
