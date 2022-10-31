@@ -1,4 +1,4 @@
-name: Deploy Branch To enviroment
+name: Deploy Master To enviroment
 
 on:
   workflow_dispatch:
@@ -18,7 +18,8 @@ jobs:
     steps:
       - name: Check out to Branch
         uses: actions/checkout@v2
-        ref: master
+        with:
+          ref: master
       - name: Initialize mandatory git config
         run: |
           git config user.name "GitHub Actions"
