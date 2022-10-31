@@ -36,6 +36,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Log PR information
         run: echo PR link ${{ github.server_url }}/${{ github.repository }}/pull/${{ env.pull_request_number }}
+      - name: Check PR is mergeable
+        run: |
+          isMergeable=$(gh pr view ${{ env.pull_request_number }} --json 'mergeable' --jq '.mergeable | contains("MERGEABLE")')
+          if [ $isMergeable = false ]
+          then
+            echo PR is not mergeable 
+            exit 1
+          fi
+      - name: Check PR checks are success
+        run: |
+          someCheckFailed=$(gh pr view ${{ env.pull_request_number }} --json 'statusCheckRollup' --jq '[.[] | .[] | .state ] | contains(["FAILURE"])')
+          if [ $someCheckFailed = true ]
+          then
+            echo At least a check failed for this PR, aborting 
+            exit 1
+          fi
       - name: Merge Release Candidate to Master
         run: gh pr merge ${{ env.pull_request_number }} -m --delete-branch --admin --subject "Merge Release Candidate v${{ env.pull_request_number }}"
         env:
