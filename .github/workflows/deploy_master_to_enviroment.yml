@@ -12,7 +12,7 @@ on:
         required: true
 
 jobs:
-  deploy_branch:
+  deploy_master_to_enviroment:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +23,7 @@ jobs:
       - name: Get current date
         id: date
         run: echo "date_time=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
-      - name: Tag RC To Enviroment
+      - name: Tag branch To Enviroment
         run: |
           git tag ${{ github.event.inputs.enviroment }}_${{ github.actor }}_${{ env.date_time }}
           git push origin ${{ github.event.inputs.enviroment }}_${{ github.actor }}_${{ env.date_time }}
