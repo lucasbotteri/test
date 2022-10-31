@@ -7,9 +7,10 @@ on:
         description: "Enviroment"
         type: choice
         options:
-          - preprod
-          - preprod2
+          - production-emea
+          - demo
         required: true
+
 jobs:
   deploy_branch:
     runs-on: ubuntu-latest
@@ -17,6 +18,7 @@ jobs:
     steps:
       - name: Check out to Branch
         uses: actions/checkout@v2
+        ref: master
       - name: Initialize mandatory git config
         run: |
           git config user.name "GitHub Actions"
@@ -24,7 +26,7 @@ jobs:
       - name: Get current date
         id: date
         run: echo "date_time=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
-      - name: Tag branch To Enviroment
+      - name: Tag RC To Enviroment
         run: |
           git tag ${{ github.event.inputs.enviroment }}_${{ github.actor }}_${{ env.date_time }}
           git push origin ${{ github.event.inputs.enviroment }}_${{ github.actor }}_${{ env.date_time }}
