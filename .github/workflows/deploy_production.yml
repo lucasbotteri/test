@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_number:
-        description: "Release Number"
+        description: 'Release Number'
         required: true
 
 jobs:
@@ -38,7 +38,7 @@ jobs:
         run: echo PR link ${{ github.server_url }}/${{ github.repository }}/pull/${{ env.pull_request_number }}
       - name: Check PR is mergeable
         run: |
-          isMergeable=$(gh pr view ${{ env.pull_request_number }} --json 'mergeable' --jq '.mergeable | contains("MERGEABLE")')
+          isMergeable=$(gh pr view ${{ env.pull_request_number }} --json 'mergeable' --jq '.mergeable | all(. == "SUCCESS"))
           if [ $isMergeable = false ]
           then
             echo PR is not mergeable 
@@ -48,7 +48,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check PR checks are success
         run: |
-          someCheckFailed=$(gh pr view ${{ env.pull_request_number }} --json 'statusCheckRollup' --jq '[.[] | .[] | .state ] | contains(["FAILURE"])')
+          someCheckFailed=$(gh pr view ${{ env.pull_request_number }} --json 'statusCheckRollup' --jq '[.[] | .[] | .state ] | all(["FAILURE"])')
           if [ $someCheckFailed = true ]
           then
             echo At least a check failed for this PR, aborting 
@@ -57,7 +57,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Merge Release Candidate to Master
-        run: gh pr merge ${{ env.pull_request_number }} -m --delete-branch --admin --subject "Merge Release Candidate v${{ env.pull_request_number }}"
+        run: gh pr merge ${{ env.pull_request_number }} -m --delete-branch --subject "Merge Release Candidate v${{ github.event.inputs.release_number }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout out last commit on Master
@@ -70,9 +70,34 @@ jobs:
         run: echo "date_time=$(date +'%Y-%m-%d--%H-%M')" >> $GITHUB_ENV
       - name: Tag/Deploy master to production
         run: |
-          git tag production_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
-          git push origin production_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
-      - name: Create Mergeback
+          git tag automation_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
+          git push origin automation_v${{ github.event.inputs.release_number }}_${{ env.date_time }}
+
+  create_merge_back:
+    needs: deploy_master_to_production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout develop
+        with:
+          fetch-depth: 0
+          ref: develop
+        uses: actions/checkout@v2
+      - name: Create mergeback branch
+        run: git checkout -b mergeback/master-v${{ github.event.inputs.release_number }}
+      - name: Push Merbeback With No master merge
+        run: git push origin mergeback/master-v${{ github.event.inputs.release_number }}
+      - name: Merge Master
         run: gh pr create -B develop --title "Merge Back Release Candidate v${{ github.event.inputs.release_number }}" --body '' --label 'merge-back'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Merge Master to Mergeback Branch 
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: master
+          target_branch: mergeback/master-v${{ github.event.inputs.release_number }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+poner la vrsion del release y no del PR 
