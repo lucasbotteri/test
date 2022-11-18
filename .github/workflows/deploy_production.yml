@@ -77,24 +77,34 @@ jobs:
     needs: deploy_master_to_production
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout develop
+      - name: Checkout master
         with:
           fetch-depth: 0
-          ref: develop
+          ref: master
         uses: actions/checkout@v2
       - name: Create mergeback branch
         run: git checkout -b mergeback/master-v${{ github.event.inputs.release_number }}
-      - name: Push Merbeback With No master merge
+      - name: Push Merbeback With No Master Merged
         run: git push origin mergeback/master-v${{ github.event.inputs.release_number }}
+      - name: Create Mergeback PR
+        run: gh pr create -B develop --title "Merge Back Release Candidate v${{ github.event.inputs.release_number }}" --body '' --label 'merge-back'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check PR is mergeable
+        run: |
+          isMergeable=$(gh pr view ${{ env.pull_request_number }} --json 'mergeable' --jq '.mergeable | contains("MERGEABLE")')
+          if [ $isMergeable = false ]
+          then
+            echo PR has conflcits with master, please resolve it and merge manually
+            exit 1
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Merge Master to Mergeback Branch
         uses: devmasx/merge-branch@master
         with:
           type: now
-          from_branch: master
-          message: "Merge Master into Mergeback Branch"
+          from_branch: develop
           target_branch: mergeback/master-v${{ github.event.inputs.release_number }}
+          message: "Merge Master into Mergeback Branch"
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Merge Master
-        run: gh pr create -B develop --title "Merge Back Release Candidate v${{ github.event.inputs.release_number }}" --body '' --label 'merge-back'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
