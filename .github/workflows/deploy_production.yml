@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_number:
-        description: 'Release Number'
+        description: "Release Number"
         required: true
 
 jobs:
@@ -90,14 +90,10 @@ jobs:
         run: gh pr create -B develop --title "Merge Back Release Candidate v${{ github.event.inputs.release_number }}" --body '' --label 'merge-back'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Merge Master to Mergeback Branch 
+      - name: Merge Master to Mergeback Branch
         uses: devmasx/merge-branch@master
         with:
           type: now
           from_branch: master
           target_branch: mergeback/master-v${{ github.event.inputs.release_number }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-
-
-
-poner la vrsion del release y no del PR 
