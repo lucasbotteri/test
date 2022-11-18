@@ -38,7 +38,7 @@ jobs:
         run: echo PR link ${{ github.server_url }}/${{ github.repository }}/pull/${{ env.pull_request_number }}
       - name: Check PR is mergeable
         run: |
-          isMergeable=$(gh pr view ${{ env.pull_request_number }} --json 'mergeable' --jq '.mergeable | all(. == "SUCCESS"))
+          isMergeable=$(gh pr view ${{ env.pull_request_number }} --json 'mergeable' --jq '.mergeable | contains("MERGEABLE")')
           if [ $isMergeable = false ]
           then
             echo PR is not mergeable 
@@ -48,7 +48,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check PR checks are success
         run: |
-          someCheckFailed=$(gh pr view ${{ env.pull_request_number }} --json 'statusCheckRollup' --jq '[.[] | .[] | .state ] | all(["FAILURE"])')
+          someCheckFailed=$(gh pr view ${{ env.pull_request_number }} --json 'statusCheckRollup' --jq '[.[] | .[] | .state ] | all(. == "SUCCESS")')
           if [ $someCheckFailed = true ]
           then
             echo At least a check failed for this PR, aborting 
