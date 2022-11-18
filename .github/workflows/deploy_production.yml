@@ -91,6 +91,7 @@ jobs:
         with:
           type: now
           from_branch: master
+          message: "Merge Master into Mergeback Branch"
           target_branch: mergeback/master-v${{ github.event.inputs.release_number }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Merge Master
